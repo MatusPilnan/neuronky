@@ -9,7 +9,7 @@ Na podobné úlohy sa v súčasnosti používajú predovšetkým konvolučné si
 - [A Convolutional Neural Networks Denoising Approach for Salt and Pepper Noise](https://arxiv.org/ftp/arxiv/papers/1807/1807.08176.pdf)
 - [Natural Image Noise Dataset](https://arxiv.org/abs/1906.00270)
 - [Multi-level Wavelet-CNN for Image Restoration](https://arxiv.org/pdf/1805.07071v2.pdf)
-
+- https://arxiv.org/pdf/1608.03981.pdf
 
 ## Datasety
 Existuje viacero datasetov obsahujúcich zašumené aj vyčistené verzie tých istých obrázkov. Pri niektorých je aj možnosť porovnania výsledkov s inými metódami.  
@@ -18,3 +18,4 @@ Existuje viacero datasetov obsahujúcich zašumené aj vyčistené verzie tých 
 - [Natural Image Noise Dataset](https://commons.wikimedia.org/wiki/Natural_Image_Noise_Dataset)
 
 Taktiež je možnosť vygenerovať šum pomocou editoru obrázkov na vlastných fotografiách, a pokúšať sa o ich opravu. Pri tomto prístupe je však dôležité mať na pamäti použitie rôznych druhov generovaného šumu, aby bol náš model čo najviac univerzálny.
+

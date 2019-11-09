@@ -1,6 +1,6 @@
-import keras
-from keras import Model
-from keras.layers import Conv2D, BatchNormalization, Subtract, Activation
+import tensorflow.keras as keras
+from tensorflow.keras import Model
+from tensorflow.keras.layers import Conv2D, BatchNormalization, Subtract, Activation
 
 
 class DnCNN(Model):
