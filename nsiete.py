@@ -28,13 +28,13 @@ def load_image_data(scenes=None, img_limit=None):
         noisy.append(mpimg.imread(path + scene[:-1] + '/NOISY_SRGB_010.PNG'))
         gt.append(mpimg.imread(path + scene[:-1] + '/GT_SRGB_010.PNG'))
 
-    # x = np.array(noisy)
-    # y = np.array(gt)
+    x = np.array(noisy)
+    y = np.array(gt)
 
-    return noisy, gt
+    return x, y
 
 
-x, y = load_image_data(scenes=[1], img_limit=16)
+x, y = load_image_data(scenes=[1], img_limit=4)
 # %%
 
 x_train, x_test, y_train, y_test = train_test_split(x, y)
