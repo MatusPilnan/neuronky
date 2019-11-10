@@ -15,13 +15,13 @@ class DnCNN(Model):
             self.model_layers.append(Activation('relu'))
 
         self.model_layers.append(Conv2D(filters=3, kernel_size=(3,3), strides=(1,1), kernel_initializer='Orthogonal',padding='same',use_bias = False))
-        self.model_layers.append(Subtract())
+        self.subtract = (Subtract())
 
     def call(self, input, **kwargs):
         x = input
-        for layer in self.model_layers[:-1]:
+        for layer in self.model_layers:
             x = layer(x)
-        x = self.model_layers[-1]([input, x])
+        x = self.subtract([input, x])
 
         return x
 

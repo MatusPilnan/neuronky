@@ -1,25 +1,27 @@
-# %%
+#%%
 import pathlib
 
 import tensorflow.keras as keras
 import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 import re
 import tensorflow as tf
 
-
-# %%
+PATCH_SIZE = 180
+#%%
 # from tensorflow_core.python.data.ops.dataset_ops import Dataset
+from tensorflow_core.python.ops.gen_logging_ops import timestamp
 
 
 def load_image_data(scenes=None, img_limit=None):
     def decode_img(img):
-        # convert the compressed string to a 3D uint8 tensor
         img = tf.image.decode_jpeg(img, channels=3)
-        # Use `convert_image_dtype` to convert to floats in the [0,1] range.
         img = tf.image.convert_image_dtype(img, tf.float32)
-        # resize the image to the desired size.
+        img = tf.expand_dims(img, 0)
+        img = tf.image.extract_patches(img, [1,PATCH_SIZE, PATCH_SIZE, 1], [1,PATCH_SIZE,PATCH_SIZE,1], [1,1,1,1], padding='SAME')
+        img = tf.reshape(img, [-1, PATCH_SIZE, PATCH_SIZE, 3])
         return img
 
     def process_path(file_path):
@@ -50,19 +52,48 @@ def load_image_data(scenes=None, img_limit=None):
     return x
 
 
-x = load_image_data(scenes=[1], img_limit=4)
-x = x.batch(batch_size=1)
-x = x.repeat()
-# %%
+x = load_image_data()
+x = x.unbatch()
+for img in x.take(5):
+    print(str(img[0].shape))
 
-# x_train, x_test, y_train, y_test = train_test_split(x, y)
-# %%
+    plt.figure()
+    plt.imshow(img[0])
+    plt.show()
+    plt.figure()
+    plt.imshow(img[1])
+    plt.show()
+x = x.batch(batch_size=25)
+x = x.repeat()
+#%%
 
 from models import DnCNN, dcnn_loss
 
 model = DnCNN(depth=17)
-model.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss)
-model.fit(x, steps_per_epoch=1)
+model.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=['accuracy'])
+model.fit(x, steps_per_epoch=30, epochs=5)
 model.summary()
 
-# %%
+#%%
+model.save('models/%s' % timestamp())
+#%%
+loaded = keras.models.load_model('models/model1', compile=False)
+loaded.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=['accuracy'])
+img = mpimg.imread('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Data/0118_006_N6_00100_00025_3200_L/NOISY_SRGB_010.PNG')
+
+img = np.expand_dims(img, 0)
+img = tf.image.extract_patches(img, [1,PATCH_SIZE, PATCH_SIZE, 1], [1,PATCH_SIZE,PATCH_SIZE,1], [1,1,1,1], padding='SAME')
+img = tf.reshape(img, [-1, PATCH_SIZE, PATCH_SIZE, 3])
+a = img
+plt.figure()
+plt.imshow(img[50])
+plt.show()
+img = loaded.predict(np.expand_dims(img[50], 0))
+print('Prediction done ' + str(img.shape))
+#img = np.squeeze(img)
+print(tf.image.psnr(img, a[50], 1))
+# mpimg.imsave('output\model1\o.png', img)
+plt.figure()
+plt.imshow(img[0])
+plt.show()
+
