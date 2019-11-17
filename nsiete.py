@@ -1,23 +1,24 @@
 #%%
 import os
-import pathlib
-import tensorflow as tf
+import re
+from datetime import datetime
+
 import math
-import tensorflow.keras as keras
-import numpy as np
-from sklearn.model_selection import train_test_split
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-import re
+import numpy as np
+import tensorflow as tf
+import tensorflow.keras as keras
+
 from models import DnCNN, dcnn_loss
-from datetime import datetime
 
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 PATCH_SIZE = 140
+SHUFFLE_BUFFER_SIZE = 100
+TEST_SIZE = 200
 
 #%%
 # from tensorflow_core.python.data.ops.dataset_ops import Dataset
-from tensorflow_core.python.ops.gen_logging_ops import timestamp
 
 
 def load_image_data(scenes=None, img_limit=None):
@@ -119,7 +120,10 @@ x = x.unbatch()
 #     plt.imshow(img[1])
 #     plt.show()
 x = x.batch(batch_size=10)
-x = x.repeat()
+# x = x.repeat()
+shuffled_data = x.shuffle(buffer_size=SHUFFLE_BUFFER_SIZE)
+test = shuffled_data.take(TEST_SIZE).repeat()
+train = shuffled_data.skip(TEST_SIZE).repeat()
 #%%
 
 model = DnCNN(depth=20)
@@ -130,7 +134,7 @@ tensorboard_callback = keras.callbacks.TensorBoard(
     log_dir='logs\log_from_{}'.format(now.strftime("%Y-%m-%d_at_%H-%M-%S")),
     histogram_freq=1)
 
-model.fit(x=x, steps_per_epoch=3000, epochs=10, callbacks=[tensorboard_callback])
+model.fit(x=train, steps_per_epoch=3, validation_data=test, epochs=10, callbacks=[tensorboard_callback])
 #validation_split=0.2,
 model.summary()
 
