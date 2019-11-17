@@ -42,8 +42,8 @@ def load_image_data(scenes=None, img_limit=None):
         regex = regex[:-1]
         scene_instances = [i for i in scene_instances if re.search(regex, i)]
         paths = tf.data.Dataset.from_tensors(scene_instances)
-
-    paths = tf.data.TextLineDataset('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Scene_Instances.txt')
+    else:
+        paths = tf.data.TextLineDataset('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Scene_Instances.txt')
     # for f in paths.take(5):
     #     print(f.numpy())
 
