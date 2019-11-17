@@ -126,7 +126,7 @@ test = shuffled_data.take(TEST_SIZE).repeat()
 train = shuffled_data.skip(TEST_SIZE).repeat()
 #%%
 
-model = DnCNN(depth=20)
+model = DnCNN(depth=17)
 model.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=['accuracy'])
 
 now = datetime.now()
@@ -134,7 +134,7 @@ tensorboard_callback = keras.callbacks.TensorBoard(
     log_dir='logs\log_from_{}'.format(now.strftime("%Y-%m-%d_at_%H-%M-%S")),
     histogram_freq=1)
 
-model.fit(x=train, steps_per_epoch=3, validation_data=test, epochs=10, callbacks=[tensorboard_callback])
+model.fit(x=train, steps_per_epoch=2000, validation_data=test, epochs=5, validation_steps=10, callbacks=[tensorboard_callback])
 #validation_split=0.2,
 model.summary()
 
