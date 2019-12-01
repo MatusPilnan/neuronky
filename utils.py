@@ -4,6 +4,8 @@ import re
 import math
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
+from skimage.metrics import structural_similarity
 
 PATCH_SIZE = 140
 SHUFFLE_BUFFER_SIZE = 100
@@ -88,10 +90,15 @@ def patches_to_image(patches, height, width, overlap=False):
     pad = [[0, 0], [0, 0]]
 
     if overlap:
+        patches = tf.reshape(patches,
+                            [num_of_patches_vertical * 2 - 1, num_of_patches_horizontal * 2 - 1, PATCH_SIZE,
+                            PATCH_SIZE, 3])
+
         print(patches.shape)
-        im = tf.reshape(patches,
-                        [num_of_patches_vertical * 2 - 1, num_of_patches_horizontal * 2 - 1, PATCH_SIZE, PATCH_SIZE, 3])
-        print('im: ' + str(im[::2, ::2].shape))
+        patches = tf.reshape(patches, [-1, PATCH_SIZE, PATCH_SIZE, 3])
+        print(patches.shape)
+
+
         patches = tf.slice(patches, begin=[0, PATCH_SIZE // 4, PATCH_SIZE // 4, 0],
                            size=[-1, PATCH_SIZE // 2, PATCH_SIZE // 2, -1])
         num_of_patches_vertical = num_of_patches_vertical * 2 - 1
@@ -111,3 +118,14 @@ def patches_to_image(patches, height, width, overlap=False):
     result = tf.batch_to_space(reconstructed_patches, [ps, ps], pad)
     print(result.shape)
     return result
+
+
+def psnr(im1, im2):
+    return tf.image.psnr(im1, im2, max_val=1.0)
+
+
+def calculate_ssim(image1, image2):
+    image1 = image1.numpy()
+    image2 = image2.numpy()
+    score, diff = structural_similarity(image1, image2, full=True, multichannel=True)
+    return score, diff
