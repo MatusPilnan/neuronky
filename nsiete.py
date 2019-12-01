@@ -1,4 +1,5 @@
 #%%
+import os
 from datetime import datetime
 import os
 import matplotlib.image as mpimg
@@ -43,16 +44,27 @@ model.save('models\model_made_on_{}'.format(now.strftime("%Y-%m-%d_at_%H-%M-%S")
 
 #%%
 loaded = keras.models.load_model('models/model_made_on_2019-11-16_at_02-03-01', compile=False)
-loaded.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=['accuracy'])
+loaded.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=["accuracy"])
 image = mpimg.imread('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Data/0118_006_N6_00100_00025_3200_L/NOISY_SRGB_010.PNG')
 
 image_patches = image_to_patches(image)
 
 reconstructed_patches = use_predict_on_patches(image_patches, loaded)
 
+image_patches_overlap = image_to_patches(image, overlap=True)
+
+reconstructed_patches_overlap = use_predict_on_patches(image_patches_overlap, loaded)
+
 #%%
+
 joined_image = patches_to_image(image_patches, image.shape[0], image.shape[1])
+
 reconstructed_image = patches_to_image(reconstructed_patches, image.shape[0], image.shape[1])
+
+joined_image_overlap = patches_to_image(image_patches_overlap, image.shape[0], image.shape[1], overlap=True)
+
+reconstructed_image_overlap = patches_to_image(reconstructed_patches_overlap, image.shape[0], image.shape[1],
+                                               overlap=True)
 
 plt.figure()
 plt.imshow(joined_image[0])
@@ -60,4 +72,12 @@ plt.show()
 
 plt.figure()
 plt.imshow(reconstructed_image[0])
+plt.show()
+
+plt.figure()
+plt.imshow(joined_image_overlap[0])
+plt.show()
+
+plt.figure()
+plt.imshow(reconstructed_image_overlap[0])
 plt.show()

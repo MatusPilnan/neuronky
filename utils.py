@@ -66,10 +66,11 @@ def image_to_patches(image, overlap=False):
 
 def use_predict_on_patches(image_patches, model):
     predicted_patches = []
+    length = len(image_patches)
 
-    for i in range(len(image_patches)):
+    for i in range(length):
         predicted_patches.append(model.predict(np.expand_dims(image_patches[i], 0)))
-        print('Prediction done ' + str(image_patches[i].shape))
+        print('Prediction done (%d of %d) ' % (i + 1, length) + str(image_patches[i].shape))
     return predicted_patches
 
 
@@ -93,15 +94,11 @@ def patches_to_image(patches, height, width, overlap=False):
         print('im: ' + str(im[::2, ::2].shape))
         patches = tf.slice(patches, begin=[0, PATCH_SIZE // 4, PATCH_SIZE // 4, 0],
                            size=[-1, PATCH_SIZE // 2, PATCH_SIZE // 2, -1])
+        num_of_patches_vertical = num_of_patches_vertical * 2 - 1
+        num_of_patches_horizontal = num_of_patches_horizontal * 2 - 1
         print(patches.shape)
-        patches = tf.reshape(patches,
-                             [num_of_patches_vertical * 2 - 1, num_of_patches_horizontal * 2 - 1, PATCH_SIZE // 2,
-                              PATCH_SIZE // 2, 3])
-        print(patches.shape)
-        # patches = tf.reshape(patches[:-1], [-1, PATCH_SIZE, PATCH_SIZE, 3])
-        print(patches.shape)
-        patches = im[::2, ::2]
-        # ps = PATCH_SIZE // 2
+        # patches = im[::2, ::2]
+        ps = PATCH_SIZE // 2
 
     reconstructed_patches = tf.reshape(patches,
                                        [1, num_of_patches_vertical, num_of_patches_horizontal, ps * ps,
@@ -112,6 +109,7 @@ def patches_to_image(patches, height, width, overlap=False):
                                        [ps * ps, num_of_patches_vertical, num_of_patches_horizontal, 3])
 
     result = tf.batch_to_space(reconstructed_patches, [ps, ps], pad)
+    print(result.shape)
     return result
 
 
