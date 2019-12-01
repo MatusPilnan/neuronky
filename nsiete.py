@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 import os
 import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
 import tensorflow.keras as keras
 
 from models import DnCNN, dcnn_loss
@@ -44,7 +43,7 @@ model.save('models\model_made_on_{}'.format(now.strftime("%Y-%m-%d_at_%H-%M-%S")
 
 #%%
 loaded = keras.models.load_model('models/model_made_on_2019-11-16_at_02-03-01', compile=False)
-loaded.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=["accuracy"])
+loaded.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=[psnr])
 image = mpimg.imread('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Data/0118_006_N6_00100_00025_3200_L/NOISY_SRGB_010.PNG')
 
 image_patches = image_to_patches(image)
@@ -54,6 +53,7 @@ reconstructed_patches = use_predict_on_patches(image_patches, loaded)
 image_patches_overlap = image_to_patches(image, overlap=True)
 
 reconstructed_patches_overlap = use_predict_on_patches(image_patches_overlap, loaded)
+
 
 #%%
 
@@ -80,4 +80,10 @@ plt.show()
 
 plt.figure()
 plt.imshow(reconstructed_image_overlap[0])
+plt.show()
+
+score, diff = calculate_ssim(joined_image[0], reconstructed_image[0])
+
+plt.figure()
+plt.imshow(diff)
 plt.show()
