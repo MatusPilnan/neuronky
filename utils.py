@@ -14,13 +14,7 @@ def load_image_data(scenes=None, img_limit=None):
     def decode_img(img):
         img = tf.image.decode_jpeg(img, channels=3)
         img = tf.image.convert_image_dtype(img, tf.float32, True)
-        img = tf.expand_dims(img, 0)
-        img = tf.image.extract_patches(img,
-                                       [1, PATCH_SIZE, PATCH_SIZE, 1],
-                                       [1, PATCH_SIZE, PATCH_SIZE, 1],
-                                       [1, 1, 1, 1],
-                                       padding='VALID')
-        img = tf.reshape(img, [-1, PATCH_SIZE, PATCH_SIZE, 3])
+        img = image_to_patches(img)
         return img
 
     def process_path(file_path):
@@ -51,12 +45,13 @@ def load_image_data(scenes=None, img_limit=None):
     return x
 
 
-def image_to_patches(image):
+def image_to_patches(image, overlap=False):
     image = tf.expand_dims(image, 0)
-    image_patches = tf.image.extract_patches(image,
-                                             [1, PATCH_SIZE, PATCH_SIZE, 1],
-                                             [1, PATCH_SIZE, PATCH_SIZE, 1],
-                                             [1, 1, 1, 1],
+    strides = [1, PATCH_SIZE, PATCH_SIZE, 1] if not overlap else [1, PATCH_SIZE / 2, PATCH_SIZE / 2, 1]
+    image_patches = tf.image.extract_patches(images=image,
+                                             sizes=[1, PATCH_SIZE, PATCH_SIZE, 1],
+                                             strides=strides,
+                                             rates=[1, 1, 1, 1],
                                              padding='SAME')
     image_patches = tf.reshape(image_patches, [-1, PATCH_SIZE, PATCH_SIZE, 3])
     return image_patches
@@ -71,7 +66,8 @@ def use_predict_on_patches(image_patches, model):
     return predicted_patches
 
 
-def patches_to_image(patches, height, width):
+def patches_to_image(patches, height, width, overlap=False):
+    ps = PATCH_SIZE
     num_of_patches_vertical = math.ceil(height / PATCH_SIZE)
     num_of_patches_horizontal = math.ceil(width / PATCH_SIZE)
 
@@ -82,16 +78,25 @@ def patches_to_image(patches, height, width):
     print('Horizontal number of patches is: ' + str(num_of_patches_horizontal))
 
     pad = [[0, 0], [0, 0]]
-    # num_of_patches_vertical = height // PATCH_SIZE
-    # num_of_patches_horizontal = width // PATCH_SIZE
+
+    if overlap:
+        print(patches.shape)
+        patches = tf.slice(patches, begin=[0, PATCH_SIZE // 4, PATCH_SIZE // 4, 0],
+                           size=[patches.shape[0], PATCH_SIZE // 2, PATCH_SIZE // 2, 3])
+        print(patches.shape)
+        num_of_patches_vertical = math.ceil(height / PATCH_SIZE)
+        num_of_patches_horizontal = math.ceil(width / PATCH_SIZE)
+        # for i, patch in enumerate(patches):
+        #     patches[i] = tf.slice(patch, begin=[PATCH_SIZE//4,PATCH_SIZE//4, 0], size=[PATCH_SIZE//2,PATCH_SIZE//2, 3])
+        # ps = PATCH_SIZE // 2
 
     reconstructed_patches = tf.reshape(patches,
-                                       [1, num_of_patches_vertical, num_of_patches_horizontal, PATCH_SIZE * PATCH_SIZE,
+                                       [1, num_of_patches_vertical, num_of_patches_horizontal, ps * ps,
                                         3])
-    reconstructed_patches = tf.split(reconstructed_patches, PATCH_SIZE * PATCH_SIZE, 3)
+    reconstructed_patches = tf.split(reconstructed_patches, ps * ps, 3)
     reconstructed_patches = tf.stack(reconstructed_patches, axis=0)
     reconstructed_patches = tf.reshape(reconstructed_patches,
-                                       [PATCH_SIZE * PATCH_SIZE, num_of_patches_vertical, num_of_patches_horizontal, 3])
+                                       [ps * ps, num_of_patches_vertical, num_of_patches_horizontal, 3])
 
-    result = tf.batch_to_space(reconstructed_patches, [PATCH_SIZE, PATCH_SIZE], pad)
+    result = tf.batch_to_space(reconstructed_patches, [ps, ps], pad)
     return result
