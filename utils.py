@@ -113,3 +113,8 @@ def patches_to_image(patches, height, width, overlap=False):
 
     result = tf.batch_to_space(reconstructed_patches, [ps, ps], pad)
     return result
+
+
+def psnr(im1, im2):
+    return tf.image.psnr(im1, im2, max_val=1.0)
+

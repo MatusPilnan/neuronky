@@ -1,6 +1,6 @@
 #%%
 from datetime import datetime
-
+import os
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import tensorflow.keras as keras
@@ -27,7 +27,7 @@ train = shuffled_data.skip(TEST_SIZE).repeat()
 #%%
 
 model = DnCNN(depth=17)
-model.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=['accuracy'])
+model.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=[psnr])
 
 now = datetime.now()
 tensorboard_callback = keras.callbacks.TensorBoard(
