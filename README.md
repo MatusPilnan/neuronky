@@ -9,7 +9,8 @@ Na podobné úlohy sa v súčasnosti používajú predovšetkým konvolučné si
 - [A Convolutional Neural Networks Denoising Approach for Salt and Pepper Noise](https://arxiv.org/ftp/arxiv/papers/1807/1807.08176.pdf)
 - [Natural Image Noise Dataset](https://arxiv.org/abs/1906.00270)
 - [Multi-level Wavelet-CNN for Image Restoration](https://arxiv.org/pdf/1805.07071v2.pdf)
-- https://arxiv.org/pdf/1608.03981.pdf
+- [Beyond a Gaussian Denoiser: Residual Learning of Deep CNN for Image Denoising](https://arxiv.org/pdf/1608.03981.pdf)
+- [Abdelrahman Abdelhamed, Lin S., Brown M. S. "A High-Quality Denoising Dataset for Smartphone Cameras", IEEE Computer Vision and Pattern Recognition (CVPR), June 2018.](https://www.eecs.yorku.ca/~kamel/sidd/files/SIDD_CVPR_2018.pdf)
 
 ## Datasety
 Existuje viacero datasetov obsahujúcich zašumené aj vyčistené verzie tých istých obrázkov. Pri niektorých je aj možnosť porovnania výsledkov s inými metódami.  
