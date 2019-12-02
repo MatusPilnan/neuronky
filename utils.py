@@ -12,7 +12,7 @@ SHUFFLE_BUFFER_SIZE = 100
 TEST_SIZE = 200
 
 
-def load_image_data(scenes=None, overlap=False):
+def load_image_data(overlap=False):
     def decode_img(img):
         img = tf.image.decode_jpeg(img, channels=3)
         img = tf.image.convert_image_dtype(img, tf.float32, True)
@@ -36,17 +36,8 @@ def load_image_data(scenes=None, overlap=False):
 
     path = 'datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Data/'
     f = open('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Scene_Instances.txt')
-    scene_instances = f.readlines()
-    paths = None
-    if scenes is not None:
-        regex = ''
-        for scene in scenes:
-            regex = regex + '_%03d_|' % scene
-        regex = regex[:-1]
-        scene_instances = [i for i in scene_instances if re.search(regex, i)]
-        paths = tf.data.Dataset.from_tensors(scene_instances)
-    else:
-        paths = tf.data.TextLineDataset('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Scene_Instances.txt')
+
+    paths = tf.data.TextLineDataset('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Scene_Instances.txt')
     # for f in paths.take(5):
     #     print(f.numpy())
 
@@ -125,7 +116,14 @@ def psnr(im1, im2):
 
 
 def calculate_ssim(image1, image2):
-    image1 = image1.numpy()
-    image2 = image2.numpy()
+    #image1 = image1.numpy()
+    #image2 = image2.numpy()
     score, diff = structural_similarity(image1, image2, full=True, multichannel=True)
     return score, diff
+
+
+def visualize_img(img, str):
+    plt.figure()
+    plt.imshow(img)
+    plt.title(str)
+    plt.show()

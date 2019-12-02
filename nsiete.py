@@ -34,7 +34,7 @@ tensorboard_callback = keras.callbacks.TensorBoard(
     log_dir='logs\log_from_{}'.format(now.strftime("%Y-%m-%d_at_%H-%M-%S")),
     histogram_freq=1)
 
-model.fit(x=train, steps_per_epoch=2000, validation_data=test, epochs=5, validation_steps=10, callbacks=[tensorboard_callback])
+model.fit(x=train, steps_per_epoch=1000, validation_data=test, epochs=5, validation_steps=50, callbacks=[tensorboard_callback])
 model.summary()
 
 #%%
@@ -42,7 +42,7 @@ now = datetime.now()
 model.save('models\model_made_on_{}'.format(now.strftime("%Y-%m-%d_at_%H-%M-%S")))
 
 #%%
-loaded = keras.models.load_model('models/model_made_on_2019-11-16_at_02-03-01', compile=False)
+loaded = keras.models.load_model('models/model_made_on_2019-12-01_at_21-50-20', compile=False)
 loaded.compile(optimizer=keras.optimizers.Adam(), loss=dcnn_loss, metrics=[psnr])
 image = mpimg.imread('datasets/SIDD_Small_sRGB_Only/SIDD_Small_sRGB_Only/Data/0118_006_N6_00100_00025_3200_L/NOISY_SRGB_010.PNG')
 
